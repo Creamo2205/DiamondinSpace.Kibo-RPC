@@ -33,19 +33,25 @@ import com.google.zxing.NotFoundException;
 import com.google.zxing.RGBLuminanceSource;
 import com.google.zxing.Reader;
 import com.google.zxing.Result;
+import com.google.zxing.ResultPoint;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
+import com.google.zxing.multi.qrcode.QRCodeMultiReader;
 import com.google.zxing.qrcode.QRCodeReader;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * Class meant to handle commands from the Ground Data System and execute them in Astrobee
  */
 
 public class YourService extends KiboRpcService {
+
+    private Object NotFoundException;
 
     @Override
     protected void runPlan1(){
@@ -56,17 +62,30 @@ public class YourService extends KiboRpcService {
         // astrobee is undocked and the mission starts
         moveToWrapper(11.21, -9.8, 4.65, 0, 0, -0.707, 0.707);
 
-        //sacn qrcode
-        String info = " " ;
+        //scan qrcode
         Bitmap qrcode = api.getBitmapNavCam();
-        int [] intArray = new int [530 * 530]; //create array size == bitmapsize
-        qrcode.getPixels(intArray,0, qrcode.getWidth(), 0, 0, qrcode.getWidth(), qrcode.getHeight());//get bitmap pixel
-        LuminanceSource source =  new RGBLuminanceSource(qrcode.getWidth(), qrcode.getHeight(), intArray);
+        int[] intArray = new int[530*530];
+        qrcode.getPixels(intArray, 0, qrcode.getWidth(), 0, 0, qrcode.getWidth(), qrcode.getHeight());
+
+        LuminanceSource source = new RGBLuminanceSource(qrcode.getWidth(), qrcode.getHeight(),intArray);
+
         BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(source));
-        Reader qrCodeReader = new QRCodeReader();
-        info = qrCodeReader(binaryBitmap);
-        api.sendDiscoveredQR(info);
-        Log.d("info",info);
+        Reader reader = new QRCodeReader();
+
+        String info = "";
+
+        try {
+
+            Result result = Reader.decode(binaryBitmap);
+            info =  result.getMessage();
+            Log.d("LOG-DEBUGGER", info);
+
+        }
+        catch (NotFoundException e) {
+            Log.d(TAG, "Code Not Found");
+            e.printStackTrace();
+        }
+
 
         /* irradiate the laser */
         api.laserControl(true);
@@ -112,3 +131,4 @@ public class YourService extends KiboRpcService {
     }
 
 }
+
