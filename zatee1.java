@@ -4,46 +4,20 @@ import jp.jaxa.iss.kibo.rpc.api.KiboRpcService;
 import gov.nasa.arc.astrobee.Result;
 import gov.nasa.arc.astrobee.types.Point;
 import gov.nasa.arc.astrobee.types.Quaternion;
-//opencv
-import org.opencv.core.Core;
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
 //android
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.util.Log;
-import android.widget.Toast;
-//java
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import javax.imageio.ImageIO;
-//zxing
 
-import com.google.zxing.BarcodeFormat;
+//zxing
 import com.google.zxing.BinaryBitmap;
-import com.google.zxing.EncodeHintType;
 import com.google.zxing.LuminanceSource;
-import com.google.zxing.MultiFormatReader;
-import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.NotFoundException;
 import com.google.zxing.RGBLuminanceSource;
 import com.google.zxing.Reader;
-import com.google.zxing.Result;
-import com.google.zxing.ResultPoint;
-import com.google.zxing.WriterException;
-import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
-import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
-import com.google.zxing.multi.qrcode.QRCodeMultiReader;
 import com.google.zxing.qrcode.QRCodeReader;
-import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
-
-import static android.content.ContentValues.TAG;
+import com.google.zxing.ChecksumException;
+import com.google.zxing.FormatException;
 
 /**
  * Class meant to handle commands from the Ground Data System and execute them in Astrobee
@@ -51,41 +25,69 @@ import static android.content.ContentValues.TAG;
 
 public class YourService extends KiboRpcService {
 
-    private Object NotFoundException;
-
     @Override
     protected void runPlan1(){
+        //simulation scan qrcode
+        Bitmap _qrcode = api.getBitmapNavCam();
+        int[] _intArray = new int[530*530];
+        _qrcode.getPixels(_intArray, 0, _qrcode.getWidth(), 0, 0, _qrcode.getWidth(), _qrcode.getHeight());
+        String _info = "";
+
+        LuminanceSource _source = new RGBLuminanceSource(_qrcode.getWidth(), _qrcode.getHeight(),_intArray);
+        BinaryBitmap _binaryBitmap = new BinaryBitmap(new HybridBinarizer(_source));
+
+        Reader _reader = new QRCodeReader();
+        try {
+            Log.d("LOG-DEBUGGER", "DECODE STARTED");
+            _info = _reader.decode(_binaryBitmap).getText();
+            Log.d("LOG-DEBUGGER","DECODE FINISHED");
+            Log.d("LOG-DEBUGGER","INFO IS "+_info);
+        }
+        catch (NotFoundException e) {
+            e.printStackTrace();
+        }
+        catch (ChecksumException e) {
+            e.printStackTrace();
+        }
+        catch (FormatException e) {
+            e.printStackTrace();
+        }
         // astrobee is undocked and the mission starts by using this command
         api.startMission();
         //example
 
         // astrobee is undocked and the mission starts
-        moveToWrapper(11.21, -9.8, 4.65, 0, 0, -0.707, 0.707);
+        moveToWrapper(11.21, -9.8, 4 , 0, 0, -0.707, 0.707);
 
         //scan qrcode
         Bitmap qrcode = api.getBitmapNavCam();
-        int[] intArray = new int[530*530];
+        int[] intArray = new int[qrcode.getWidth()*qrcode.getHeight()];
         qrcode.getPixels(intArray, 0, qrcode.getWidth(), 0, 0, qrcode.getWidth(), qrcode.getHeight());
-
-        LuminanceSource source = new RGBLuminanceSource(qrcode.getWidth(), qrcode.getHeight(),intArray);
-
-        BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(source));
-        Reader reader = new QRCodeReader();
-
         String info = "";
 
+        LuminanceSource source = new RGBLuminanceSource(qrcode.getWidth(), qrcode.getHeight(),intArray);
+        BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(source));
+
+        Reader reader = new QRCodeReader();
         try {
-
-            Result result = Reader.decode(binaryBitmap);
-            info =  result.getMessage();
-            Log.d("LOG-DEBUGGER", info);
-
+            Log.d("LOG-DEBUGGER", "DECODE STARTED");
+            info = reader.decode(binaryBitmap).getText();
+            Log.d("LOG-DEBUGGER","DECODE FINISHED");
+            Log.d("LOG-DEBUGGER","INFO IS "+info);
         }
         catch (NotFoundException e) {
-            Log.d(TAG, "Code Not Found");
             e.printStackTrace();
+            Log.d("LOG-DEBUGGER","NFEerror"+e.toString());
         }
-
+        catch (ChecksumException e) {
+            e.printStackTrace();
+            Log.d("LOG-DEBUGGER","CEerror"+e.toString());
+        }
+        catch (FormatException e) {
+            e.printStackTrace();
+            Log.d("LOG-DEBUGGER","FEerror"+e.toString());
+        }
+        api.sendDiscoveredQR(info);
 
         /* irradiate the laser */
         api.laserControl(true);
@@ -131,4 +133,3 @@ public class YourService extends KiboRpcService {
     }
 
 }
-
