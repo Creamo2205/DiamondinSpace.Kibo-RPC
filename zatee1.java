@@ -25,33 +25,13 @@ import com.google.zxing.FormatException;
 
 public class YourService extends KiboRpcService {
 
+    public String info = "";
+
     @Override
     protected void runPlan1(){
         //simulation scan qrcode
-        Bitmap _qrcode = api.getBitmapNavCam();
-        int[] _intArray = new int[530*530];
-        _qrcode.getPixels(_intArray, 0, _qrcode.getWidth(), 0, 0, _qrcode.getWidth(), _qrcode.getHeight());
-        String _info = "";
+       simscanner();
 
-        LuminanceSource _source = new RGBLuminanceSource(_qrcode.getWidth(), _qrcode.getHeight(),_intArray);
-        BinaryBitmap _binaryBitmap = new BinaryBitmap(new HybridBinarizer(_source));
-
-        Reader _reader = new QRCodeReader();
-        try {
-            Log.d("LOG-DEBUGGER", "DECODE STARTED");
-            _info = _reader.decode(_binaryBitmap).getText();
-            Log.d("LOG-DEBUGGER","DECODE FINISHED");
-            Log.d("LOG-DEBUGGER","INFO IS "+_info);
-        }
-        catch (NotFoundException e) {
-            e.printStackTrace();
-        }
-        catch (ChecksumException e) {
-            e.printStackTrace();
-        }
-        catch (FormatException e) {
-            e.printStackTrace();
-        }
         // astrobee is undocked and the mission starts by using this command
         api.startMission();
         //example
@@ -60,10 +40,52 @@ public class YourService extends KiboRpcService {
         moveToWrapper(11.21, -9.8, 4 , 0, 0, -0.707, 0.707);
 
         //scan qrcode
+        scanner();
+
+        api.sendDiscoveredQR(info);
+
+        /* irradiate the laser */
+        api.laserControl(true);
+
+        // take snapshots
+        api.takeSnapshot();
+
+        // move to the rear of Bay7
+        moveToWrapper(10.6, -8.0, 4.5, 0, 0, -0.707, 0.707);
+
+        // Send mission completion
+        api.reportMissionCompletion();
+
+    }
+
+    public void simscanner(){
+        Bitmap _qrcode = api.getBitmapNavCam();
+        int[] _intArray = new int[530 * 530];
+        _qrcode.getPixels(_intArray, 0, _qrcode.getWidth(), 0, 0, _qrcode.getWidth(), _qrcode.getHeight());
+        String _info = "";
+
+        LuminanceSource _source = new RGBLuminanceSource(_qrcode.getWidth(), _qrcode.getHeight(), _intArray);
+        BinaryBitmap _binaryBitmap = new BinaryBitmap(new HybridBinarizer(_source));
+
+        Reader _reader = new QRCodeReader();
+        try {
+            Log.d("LOG-DEBUGGER", "DECODE STARTED");
+            _info = _reader.decode(_binaryBitmap).getText();
+            Log.d("LOG-DEBUGGER", "DECODE FINISHED");
+            Log.d("LOG-DEBUGGER", "INFO IS " + _info);
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+        } catch (ChecksumException e) {
+            e.printStackTrace();
+        } catch (FormatException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void scanner(){
         Bitmap qrcode = api.getBitmapNavCam();
         int[] intArray = new int[qrcode.getWidth()*qrcode.getHeight()];
         qrcode.getPixels(intArray, 0, qrcode.getWidth(), 0, 0, qrcode.getWidth(), qrcode.getHeight());
-        String info = "";
 
         LuminanceSource source = new RGBLuminanceSource(qrcode.getWidth(), qrcode.getHeight(),intArray);
         BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(source));
@@ -87,20 +109,6 @@ public class YourService extends KiboRpcService {
             e.printStackTrace();
             Log.d("LOG-DEBUGGER","FEerror"+e.toString());
         }
-        api.sendDiscoveredQR(info);
-
-        /* irradiate the laser */
-        api.laserControl(true);
-
-        // take snapshots
-        api.takeSnapshot();
-
-        // move to the rear of Bay7
-        moveToWrapper(10.6, -8.0, 4.5, 0, 0, -0.707, 0.707);
-
-        // Send mission completion
-        api.reportMissionCompletion();
-
     }
 
     @Override
