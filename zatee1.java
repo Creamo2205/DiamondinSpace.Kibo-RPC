@@ -1,4 +1,5 @@
-package jp.jaxa.iss.kibo.rpc.sampleapk;
+package jp.jaxa.iss.kibo.rpc.defaultapk;
+
 //astrobee
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcService;
 import gov.nasa.arc.astrobee.Result;
@@ -30,19 +31,21 @@ public class YourService extends KiboRpcService {
     @Override
     protected void runPlan1(){
         //simulation scan qrcode
-       simscanner();
+        simscanner();
 
         // astrobee is undocked and the mission starts by using this command
         api.startMission();
         //example
 
-        // astrobee is undocked and the mission starts
-        moveToWrapper(11.21, -9.8, 4 , 0, 0, -0.707, 0.707);
+        // astrobee is undocked and the mission start
+        moveToWrapper(11.21, -9.8, 4.79 , 0, 0, -0.707, 0.707);
 
         //scan qrcode
-        scanner();
+        scanner(api.getBitmapNavCam());
 
         api.sendDiscoveredQR(info);
+
+        //TODO move to point A '
 
         /* irradiate the laser */
         api.laserControl(true);
@@ -59,10 +62,11 @@ public class YourService extends KiboRpcService {
     }
 
     public void simscanner(){
-        Bitmap _qrcode = api.getBitmapNavCam();
-        int[] _intArray = new int[530 * 530];
+        Log.d("LOG-DEBUGGER","START FAKE SCANNER METHOD");
+        Bitmap _qrcode = Bitmap.createBitmap(640, 480, Bitmap.Config.ARGB_8888);; //let me edit your code
+        int[] _intArray = new int[_qrcode.getHeight() * _qrcode.getWidth()];
         _qrcode.getPixels(_intArray, 0, _qrcode.getWidth(), 0, 0, _qrcode.getWidth(), _qrcode.getHeight());
-        String _info = "";
+        String _info = " ";
 
         LuminanceSource _source = new RGBLuminanceSource(_qrcode.getWidth(), _qrcode.getHeight(), _intArray);
         BinaryBitmap _binaryBitmap = new BinaryBitmap(new HybridBinarizer(_source));
@@ -80,10 +84,11 @@ public class YourService extends KiboRpcService {
         } catch (FormatException e) {
             e.printStackTrace();
         }
+        Log.d("LOG-DEBUGGER","FINISH FAKE SCANNER METHOD");
     }
 
-    public void scanner(){
-        Bitmap qrcode = api.getBitmapNavCam();
+    public void scanner(Bitmap qrcode){
+        Log.d("LOG-DEBUGGER","START SCANNER METHOD");
         int[] intArray = new int[qrcode.getWidth()*qrcode.getHeight()];
         qrcode.getPixels(intArray, 0, qrcode.getWidth(), 0, 0, qrcode.getWidth(), qrcode.getHeight());
 
@@ -109,6 +114,7 @@ public class YourService extends KiboRpcService {
             e.printStackTrace();
             Log.d("LOG-DEBUGGER","FEerror"+e.toString());
         }
+        Log.d("LOG-DEBUGGER","FINISH SCANNER METHOD");
     }
 
     @Override
