@@ -2,7 +2,6 @@ package jp.jaxa.iss.kibo.rpc.defaultapk;
 
 //astrobee
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcService;
-import jp.jaxa.iss.kibo.rpc.api.types.PointCloud;
 import gov.nasa.arc.astrobee.Result;
 import gov.nasa.arc.astrobee.types.Point;
 import gov.nasa.arc.astrobee.types.Quaternion;
@@ -22,13 +21,6 @@ import com.google.zxing.qrcode.QRCodeReader;
 import com.google.zxing.ChecksumException;
 import com.google.zxing.FormatException;
 
-//other
-import org.opencv.core.Mat;
-
-import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * Class meant to handle commands from the Ground Data System and execute them in Astrobee
  */
@@ -38,7 +30,6 @@ public class YourService extends KiboRpcService {
     public String info = "";
     public int pattern;
     public float posX, posY, posZ;
-    public float PointCloud;
 
     @Override
     protected void runPlan1() {
@@ -89,9 +80,7 @@ public class YourService extends KiboRpcService {
         }
         Log.d("LOG-DEBUGGER","P : "+pattern+" X : "+posX+ " Y : "+posY+" Z : "+posZ);
 
-        moveToWrapper(posX,posY,posZ,0,0,-0.707,0.707);
-
-        moving(pattern);
+        rescan(info);
 
         // move to the rear of Bay7
         //astronaut
@@ -155,24 +144,46 @@ public class YourService extends KiboRpcService {
             e.printStackTrace();
             Log.d("LOG-DEBUGGER","FEerror"+e.toString());
         }
+        Log.d("LOG-DEBUGGER","RAW DATA = "+info);
         Log.d("LOG-DEBUGGER","FINISH SCANNER METHOD");
     }
 
+    //re scan
+    public void rescan(String info){
+        if (info == " "){
+            scanner(api.getBitmapNavCam());
+        }
+        else {
+            moving(pattern);
+        }
+    }
+
+
     public void moving(int pattern){
         if(pattern == 1){
-            moveToWrapper(posX,posY,posZ,0,0,-0.707,0.707);
+            moveToWrapper(posX,posY,posZ, -0.295,-0.010,-0.707,0.707);
             api.laserControl(true);
             api.takeSnapshot();
+            api.laserControl(false);
+            moveToWrapper(posX, posY, 4.5, 0, 0, -0.707, 0.707);
+            moveToWrapper(10.3,-9.8,4.5,0,0,0.707,-0.707);
+            //status : should improve
         }
         else if(pattern == 2){
-            moveToWrapper(posX,posY,posZ,0,0,-0.707,0.707);
+            moveToWrapper(posX,posY,posZ,0.15,-0.29,-0.707,0.707);
             api.laserControl(true);
             api.takeSnapshot();
+            api.laserControl(false);
+            moveToWrapper(10.3,-9.8,4.37,0,0,0.707,-0.707);
+            //status : PLOY
         }
         else if(pattern == 3){
-            moveToWrapper(posX,posY,posZ,0,0,-0.707,0.707);
+            moveToWrapper(posX,posY,posZ, 0.43,-0.467,-0.707,0.737);
             api.laserControl(true);
             api.takeSnapshot();
+            api.laserControl(false);
+            moveToWrapper(10.3,-9,4.37,0,0,0.707,-0.707);
+            //status : should improve and waiting for target
         }
         else if(pattern == 4){
             moveToWrapper(posX,posY,posZ,0.1,-0.3,-0.707,0.707);
@@ -180,31 +191,49 @@ public class YourService extends KiboRpcService {
             api.takeSnapshot();
             api.laserControl(false);
             moveToWrapper(10.3,-9.8,4.37,0,0,0.707,-0.707);
+            //status : should improve and PLOY improve to shoot target
         }
         else if(pattern == 5){
-            moveToWrapper(posX,posY,posZ,0,0,-0.707,0.707);
+            moveToWrapper(10.5,-9.8,4.79,0,0,-0.707,0.707);
+            moveToWrapper(10.5,-9.8,posZ,0,0,-0.707,0.707);
+            moveToWrapper(posX,posY,posZ,-0.1,0.1,-0.663,0.733);
             api.laserControl(true);
             api.takeSnapshot();
             api.laserControl(false);
+            moveToWrapper(10.6,-9.8,posZ,0,0,-0.707,0.707);
+            //status : editing
         }
         else if(pattern == 6){
-            moveToWrapper(posX,posY,posZ,0,0,-0.707,0.707);
+            moveToWrapper(11.21, -9.8, 4.79, -0.27285256777068984,-0.25667406587268515,-0.6753338034101134,0.6352906060543915);
             api.laserControl(true);
             api.takeSnapshot();
+            api.laserControl(false);
+            moveToWrapper(10.3, -10.2, 4.37, 0,0, -0.707, 0.707);
+            moveToWrapper(10.3, -9.8, 4.37, 0,0, -0.707, 0.707);
+            //status : PLOY
         }
         else if(pattern == 7){
-            moveToWrapper(posX,posY,posZ,0,0,-0.707,0.707);
+            moveToWrapper(11.5, -9.8, 4.79, 0, 0, -0.707, 0.707);
+            moveToWrapper(11.5,-9.8,5.3,0,0,-0.707,0.707);
+            moveToWrapper(posX,posY,posZ,0.638,-0.084,-0.1,-0.759);
             api.laserControl(true);
             api.takeSnapshot();
+            api.laserControl(false);
+            moveToWrapper(11.5,-9.8,5.3,0,0,-0.707,0.707);
+            moveToWrapper(11.5, -9.8, 4.79, 0, 0, -0.707, 0.707);
+            moveToWrapper(10.3,-9.8,4.79,0,0,-0.707,0.707);
+            //status : editing
         }
         else{
-            moveToWrapper(posX,posY,posZ,0,0,-0.707,0.707);
+            moveToWrapper(posX,posY,posZ,-0.435,0.165,-0.787,0.627);
             api.laserControl(true);
             api.takeSnapshot();
+            api.laserControl(false);
+            moveToWrapper(11.21,-9.8,4.79,0,0,-0.707,0.707);
+            moveToWrapper(10.3,-9.8,4.5,0,0,-0.707,0.707);
+            //status : should improve
         }
     }
-
-
 
     @Override
     protected void runPlan3(){
