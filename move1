@@ -1,25 +1,25 @@
 package jp.jaxa.iss.kibo.rpc.defaultapk;
 
 //astrobee
-import jp.jaxa.iss.kibo.rpc.api.KiboRpcService;
-import gov.nasa.arc.astrobee.Result;
-import gov.nasa.arc.astrobee.types.Point;
-import gov.nasa.arc.astrobee.types.Quaternion;
+        import jp.jaxa.iss.kibo.rpc.api.KiboRpcService;
+        import gov.nasa.arc.astrobee.Result;
+        import gov.nasa.arc.astrobee.types.Point;
+        import gov.nasa.arc.astrobee.types.Quaternion;
 
 //android
-import android.graphics.Bitmap;
-import android.util.Log;
+        import android.graphics.Bitmap;
+        import android.util.Log;
 
 //zxing
-import com.google.zxing.BinaryBitmap;
-import com.google.zxing.LuminanceSource;
-import com.google.zxing.NotFoundException;
-import com.google.zxing.RGBLuminanceSource;
-import com.google.zxing.Reader;
-import com.google.zxing.common.HybridBinarizer;
-import com.google.zxing.qrcode.QRCodeReader;
-import com.google.zxing.ChecksumException;
-import com.google.zxing.FormatException;
+        import com.google.zxing.BinaryBitmap;
+        import com.google.zxing.LuminanceSource;
+        import com.google.zxing.NotFoundException;
+        import com.google.zxing.RGBLuminanceSource;
+        import com.google.zxing.Reader;
+        import com.google.zxing.common.HybridBinarizer;
+        import com.google.zxing.qrcode.QRCodeReader;
+        import com.google.zxing.ChecksumException;
+        import com.google.zxing.FormatException;
 
 /**
  * Class meant to handle commands from the Ground Data System and execute them in Astrobee
@@ -46,7 +46,7 @@ public class YourService extends KiboRpcService {
         //scan qrcode
         scanner(api.getBitmapNavCam());
 
-        api.sendDiscoveredQR(info);
+        rescan(info);
 
         //TODO move to point A '
 
@@ -79,10 +79,6 @@ public class YourService extends KiboRpcService {
 
         }
         Log.d("LOG-DEBUGGER","P : "+pattern+" X : "+posX+ " Y : "+posY+" Z : "+posZ);
-
-        scanner(api.getBitmapNavCam());
-
-        rescan(info);
 
         // move to the rear of Bay7
         //astronaut
@@ -155,26 +151,28 @@ public class YourService extends KiboRpcService {
         if (info == ""){
             scanner(api.getBitmapNavCam());
             Log.d("LOG-DEBUGGER","FINISH reSCANNER");
+            api.sendDiscoveredQR(info);
             moving(pattern);
         }
         else {
-             moving(pattern);
+            api.sendDiscoveredQR(info);
+            moving(pattern);
         }
     }
 
 
     public void moving(int pattern){
         if(pattern == 1){
-            moveToWrapper(posX,posY,posZ, -0.295235,0.10898,-0.698,0.707);
+            moveToWrapper(posX,posY,posZ, -0.27987656,0.1,-0.65757689, 0.707);
             api.laserControl(true);
             api.takeSnapshot();
             api.laserControl(false);
-            moveToWrapper(posX, -9.6, 4.5, 0, 0, -0.707, 0.707);
-            moveToWrapper(10.6,-9,4.5,0,0,0.707,-0.707);
+            moveToWrapper(posX, -9.6, 4.73, 0, 0, -0.707, 0.707);
+            moveToWrapper(10.55,-9.3,4.5,0,0,0.707,-0.707);
             //status : should improve
         }
         else if(pattern == 2){
-            moveToWrapper(posX,posY,posZ,0.15,-0.29,-0.707,0.707);
+            moveToWrapper(posX,posY,posZ,0.20,-0.35,-0.707,0.707);
             api.laserControl(true);
             api.takeSnapshot();
             api.laserControl(false);
@@ -182,11 +180,11 @@ public class YourService extends KiboRpcService {
             //status : PLOY
         }
         else if(pattern == 3){
-            moveToWrapper(posX,posY,posZ, 0.4398413, -0.52438,-0.707, 0.707);
+            moveToWrapper(posX,posY,posZ, 0.4398413, -0.53543,-0.707, 0.707);
             api.laserControl(true);
             api.takeSnapshot();
             api.laserControl(false);
-            moveToWrapper(10.6,-9,4.5,0,0,0.707,-0.707);
+            moveToWrapper(10.57,-9,4.45,0,0,0.707,-0.707);
             //status : should improve and waiting for target
         }
         else if(pattern == 4){
@@ -219,22 +217,22 @@ public class YourService extends KiboRpcService {
         else if(pattern == 7){
             moveToWrapper(11.5, -9.8, 4.79, 0, 0, -0.707, 0.707);
             moveToWrapper(11.5,-9.8,5.3,0,0,-0.707,0.707);
-            moveToWrapper(posX,posY,posZ,0.638,-0.084,-0.1,-0.759);
+            moveToWrapper(posX,posY,posZ,0.620,-0.051,-0.1,-0.759);
             api.laserControl(true);
             api.takeSnapshot();
             api.laserControl(false);
             moveToWrapper(11.5,-9.8,5.3,0,0,-0.707,0.707);
             moveToWrapper(11.5, -9.8, 4.79, 0, 0, -0.707, 0.707);
-            moveToWrapper(10.3,-9.8,4.79,0,0,-0.707,0.707);
+            moveToWrapper(10.55,-9.0,4.5,0,0,-0.707,0.707);
             //status : editing
         }
         else{
-            moveToWrapper(posX,posY,posZ,-0.42576567876567,0.2004231234,-0.787,0.627);
+            moveToWrapper(posX,posY,posZ,-0.42576567876567,0.2009231234,-0.787,0.627);
             api.laserControl(true);
             api.takeSnapshot();
             api.laserControl(false);
             moveToWrapper(11.21,-9.8,4.79,0,0,-0.707,0.707);
-            moveToWrapper(10.6,-9,4.5,0,0,-0.707,0.707);
+            moveToWrapper(10.55,-9,4.5,0,0,-0.707,0.707);
             //status : should improve
         }
     }
