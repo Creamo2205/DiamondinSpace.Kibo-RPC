@@ -80,6 +80,8 @@ public class YourService extends KiboRpcService {
         }
         Log.d("LOG-DEBUGGER","P : "+pattern+" X : "+posX+ " Y : "+posY+" Z : "+posZ);
 
+        scanner(api.getBitmapNavCam());
+
         rescan(info);
 
         // move to the rear of Bay7
@@ -150,23 +152,25 @@ public class YourService extends KiboRpcService {
 
     //re scan
     public void rescan(String info){
-        if (info == " "){
+        if (info == ""){
             scanner(api.getBitmapNavCam());
+            Log.d("LOG-DEBUGGER","FINISH reSCANNER");
+            moving(pattern);
         }
         else {
-            moving(pattern);
+             moving(pattern);
         }
     }
 
 
     public void moving(int pattern){
         if(pattern == 1){
-            moveToWrapper(posX,posY,posZ, -0.295,-0.010,-0.707,0.707);
+            moveToWrapper(posX,posY,posZ, -0.295235,0.10898,-0.698,0.707);
             api.laserControl(true);
             api.takeSnapshot();
             api.laserControl(false);
-            moveToWrapper(posX, posY, 4.5, 0, 0, -0.707, 0.707);
-            moveToWrapper(10.3,-9.8,4.5,0,0,0.707,-0.707);
+            moveToWrapper(posX, -9.6, 4.5, 0, 0, -0.707, 0.707);
+            moveToWrapper(10.6,-9,4.5,0,0,0.707,-0.707);
             //status : should improve
         }
         else if(pattern == 2){
@@ -178,11 +182,11 @@ public class YourService extends KiboRpcService {
             //status : PLOY
         }
         else if(pattern == 3){
-            moveToWrapper(posX,posY,posZ, 0.43,-0.467,-0.707,0.737);
+            moveToWrapper(posX,posY,posZ, 0.4398413, -0.52438,-0.707, 0.707);
             api.laserControl(true);
             api.takeSnapshot();
             api.laserControl(false);
-            moveToWrapper(10.3,-9,4.37,0,0,0.707,-0.707);
+            moveToWrapper(10.6,-9,4.5,0,0,0.707,-0.707);
             //status : should improve and waiting for target
         }
         else if(pattern == 4){
@@ -225,12 +229,12 @@ public class YourService extends KiboRpcService {
             //status : editing
         }
         else{
-            moveToWrapper(posX,posY,posZ,-0.435,0.165,-0.787,0.627);
+            moveToWrapper(posX,posY,posZ,-0.42576567876567,0.2004231234,-0.787,0.627);
             api.laserControl(true);
             api.takeSnapshot();
             api.laserControl(false);
             moveToWrapper(11.21,-9.8,4.79,0,0,-0.707,0.707);
-            moveToWrapper(10.3,-9.8,4.5,0,0,-0.707,0.707);
+            moveToWrapper(10.6,-9,4.5,0,0,-0.707,0.707);
             //status : should improve
         }
     }
