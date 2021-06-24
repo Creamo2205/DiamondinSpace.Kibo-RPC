@@ -48,6 +48,8 @@ public class YourService extends KiboRpcService {
 
         rescan(info);
 
+        //api.sendDiscoveredQR(info);
+
         //TODO move to point A '
 
         String  [] coor = info.split("\"");
@@ -79,6 +81,8 @@ public class YourService extends KiboRpcService {
 
         }
         Log.d("LOG-DEBUGGER","P : "+pattern+" X : "+posX+ " Y : "+posY+" Z : "+posZ);
+
+        moving(pattern);
 
         // move to the rear of Bay7
         //astronaut
@@ -148,22 +152,19 @@ public class YourService extends KiboRpcService {
 
     //re scan
     public void rescan(String info){
-        if (info == ""){
+        if(info == ""){
             scanner(api.getBitmapNavCam());
-            Log.d("LOG-DEBUGGER","FINISH reSCANNER");
             api.sendDiscoveredQR(info);
-            moving(pattern);
         }
-        else {
+        else{
             api.sendDiscoveredQR(info);
-            moving(pattern);
         }
     }
 
 
     public void moving(int pattern){
         if(pattern == 1){
-            moveToWrapper(posX,posY,posZ, -0.27987656,0.1,-0.65757689, 0.707);
+            moveToWrapper(posX,posY,posZ, -0.295235,0.10898,-0.698, 0.707);
             api.laserControl(true);
             api.takeSnapshot();
             api.laserControl(false);
@@ -172,7 +173,7 @@ public class YourService extends KiboRpcService {
             //status : should improve
         }
         else if(pattern == 2){
-            moveToWrapper(posX,posY,posZ,0.20,-0.35,-0.707,0.707);
+            moveToWrapper(posX,posY,posZ,0.15,-0.29,-0.707,0.707);
             api.laserControl(true);
             api.takeSnapshot();
             api.laserControl(false);
@@ -180,7 +181,7 @@ public class YourService extends KiboRpcService {
             //status : PLOY
         }
         else if(pattern == 3){
-            moveToWrapper(posX,posY,posZ, 0.4398413, -0.53543,-0.707, 0.707);
+            moveToWrapper(posX,posY,posZ, 0.4398413, -0.53643,-0.707, 0.707);
             api.laserControl(true);
             api.takeSnapshot();
             api.laserControl(false);
@@ -198,7 +199,7 @@ public class YourService extends KiboRpcService {
         else if(pattern == 5){
             moveToWrapper(10.5,-9.8,4.79,0,0,-0.707,0.707);
             moveToWrapper(10.5,-9.8,posZ,0,0,-0.707,0.707);
-            moveToWrapper(posX,posY,posZ,-0.1,0.1,-0.663,0.733);
+            moveToWrapper(posX,posY,posZ,-0.082,0.104,-0.664,0.734);
             api.laserControl(true);
             api.takeSnapshot();
             api.laserControl(false);
@@ -217,7 +218,7 @@ public class YourService extends KiboRpcService {
         else if(pattern == 7){
             moveToWrapper(11.5, -9.8, 4.79, 0, 0, -0.707, 0.707);
             moveToWrapper(11.5,-9.8,5.3,0,0,-0.707,0.707);
-            moveToWrapper(posX,posY,posZ,0.620,-0.051,-0.1,-0.759);
+            moveToWrapper(posX,posY,posZ,0.638,-0.084,-0.100,-0.759);
             api.laserControl(true);
             api.takeSnapshot();
             api.laserControl(false);
